@@ -1,1 +1,1 @@
-# video based shopping application
+# Video Sharing Platform
