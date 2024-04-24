@@ -16,5 +16,5 @@ connectDB()
 })
 .catch((err) => {
     console.log("Error in connecting to db::" , err);
-    throw error;
+    throw err;
 })
