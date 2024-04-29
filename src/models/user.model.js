@@ -25,8 +25,8 @@ const userSchema = new mongoose.Schema({
         index : true
     },
     avatar : {
-        type : String, // cloudinary url
-        required : true   
+        type : String, // cloudinary url 
+        required : true
     },
     coverImage : {
         type : String, // cloudinary url
@@ -51,7 +51,7 @@ userSchema.pre("save" ,async function (next) {
     if(!this.isModified("password")){
        return next();
     }
-   this.password = brcypt.hash(this.password , 10);
+   this.password = await brcypt.hash(this.password , 10);
    next();
 });
 
