@@ -7,6 +7,8 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 // Register the new user
 export const registerUser = asyncHandler( async(req , res) => {
+    console.log("req.body->" , req.body);
+    console.log("req.files-> " , req.files);
     const {
         userName, 
         email, 
@@ -30,7 +32,11 @@ export const registerUser = asyncHandler( async(req , res) => {
 
     const avatarLocalPath = req.files?.avatar[0]?.path;
 
-    const coverImageLocalpath = req.files?.coverImage[0]?.path;
+    // const coverImageLocalpath = req.files?.coverImage[0]?.path;
+    let coverImageLocalpath;
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
+        coverImageLocalpath = req.files.coverImage[0].path;
+    }
 
     if(!avatarLocalPath){
         throw new ApiError(400 , "Avatar file is required!");
@@ -40,6 +46,7 @@ export const registerUser = asyncHandler( async(req , res) => {
     const coverImage = await uploadOnCloudinary(coverImageLocalpath);
 
     if(!avatar) {
+        console.log(avatar);
         throw new ApiError(400 , "Avatar is required");
     }
 
