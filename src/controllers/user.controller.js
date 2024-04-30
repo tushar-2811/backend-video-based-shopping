@@ -26,6 +26,13 @@ const generateAccessAndRefreshTokens = async (userId) => {
 }
 
 
+const options = {
+    httpOnly : true,
+    secure : true
+};
+
+
+
 // Register the new user
 export const registerUser = asyncHandler( async(req , res) => {
     console.log("req.body->" , req.body);
@@ -127,11 +134,6 @@ export const loginUser = asyncHandler( async(req , res) => {
     "-password -refreshToken"
    );
    
-   const options = {
-       httpOnly : true,
-       secure : true
-   };
-
    return res.status(201)
          .cookie("accessToken" , accessToken , options)
          .cookie("refreshToken" , refreshToken , options)
@@ -146,7 +148,24 @@ export const loginUser = asyncHandler( async(req , res) => {
 
 
 export const logoutUser = asyncHandler(async(req , res) => {
-      
+      const userId = req.user._id;
+
+      await User.findByIdAndUpdate(userId , {
+          $set : {
+             refreshToken : undefined
+          }
+      });
+
+      return res.status(201)
+      .clearCookie("accessToken", options)
+      .clearCookie("refreshToken",options)
+      .json(
+        new ApiResponse(201 , "User Logged out successfully")
+      )
+
+
+
+
 })
 
 
