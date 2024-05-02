@@ -271,7 +271,7 @@ export const updateAvatar = asyncHandler(async(req , res) => {
 
 // user channel profile
 export const getUserChannelProfile = asyncHandler(async(req , res) => {
-    const {userName} = req.params();
+    const {userName} = req.params;
 
     if(!userName?.trim()){
         throw new ApiError(400 , "userName is missing");
