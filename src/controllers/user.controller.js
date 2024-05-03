@@ -4,6 +4,7 @@ import {User} from "../models/user.model.js";
 import {uploadOnCloudinary} from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from 'jsonwebtoken';
+import mongoose from "mongoose";
 
 
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -340,6 +341,56 @@ export const getUserChannelProfile = asyncHandler(async(req , res) => {
     )
 
 })
+
+
+
+// user's History
+export const getWatchHistory = asyncHandler(async(req , res) => {
+    const user = await User.aggregate([
+        {
+            $match : {
+                _id : new mongoose.Types.ObjectId(req.user._id)
+            }
+        },
+        {
+            $lookup : {
+                from : "videos",
+                localField : "watchHistory",
+                foreignField : "_id",
+                as : "watchHistory",
+                pipeline : [
+                    {
+                        $lookup : {
+                        from :   "users",
+                        localField : "owner",
+                        foreignField : "_id",
+                        as : "owner",
+                        pipeline : [
+                            {
+                                $project : {
+                                    userName : 1,
+                                    fullName : 1,
+                                    avatar : 1
+                                }
+                            }
+                        ]
+                        }
+                    }
+                ]
+            }
+        },
+    ])
+
+    if(!user?.length){
+        throw new ApiError(400 , "User History does not exist");
+    }
+
+    return res.status(201).json(
+        new ApiResponse(201 , user[0] , "User history fetched successfully")
+    )
+})
+
+
 
 
 
