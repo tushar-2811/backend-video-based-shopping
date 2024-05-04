@@ -361,11 +361,11 @@ export const getWatchHistory = asyncHandler(async(req , res) => {
                 pipeline : [
                     {
                         $lookup : {
-                        from :   "users",
-                        localField : "owner",
-                        foreignField : "_id",
-                        as : "owner",
-                        pipeline : [
+                           from :   "users",
+                           localField : "owner",
+                           foreignField : "_id",
+                           as : "owner",
+                           pipeline : [
                             {
                                 $project : {
                                     userName : 1,
@@ -375,6 +375,13 @@ export const getWatchHistory = asyncHandler(async(req , res) => {
                             }
                         ]
                         }
+                    },
+                    {
+                         $addFields : {
+                            owner : {
+                                $first : "$owner"
+                            }
+                         }
                     }
                 ]
             }
@@ -386,7 +393,7 @@ export const getWatchHistory = asyncHandler(async(req , res) => {
     }
 
     return res.status(201).json(
-        new ApiResponse(201 , user[0] , "User history fetched successfully")
+        new ApiResponse(201 , user[0].getWatchHistory , "User history fetched successfully")
     )
 })
 
