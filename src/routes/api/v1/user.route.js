@@ -23,7 +23,7 @@ userRouter.route('/refreshToken').post(refreshAccessToken);
 userRouter.route('/getCurrentUser').post(verifyJWT , getCurrentUser);
 userRouter.route('/updatePassword').post(verifyJWT , changeCurrentPassword);
 
-userRouter.route('/updateAvatar').post(upload.fields(), verifyJWT , updateAvatar);
+userRouter.route('/updateAvatar').patch(upload.fields(), verifyJWT , updateAvatar);
 
 userRouter.route('/getUserChannel/:userName').post(verifyJWT,getUserChannelProfile);
 userRouter.route('/getUserHistory').get(verifyJWT,getWatchHistory)
