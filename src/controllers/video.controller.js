@@ -65,3 +65,25 @@ export const deleteVideo = asyncHandler(async(req , res) => {
         new ApiResponse(201 , {} , "Deleted Successfully")
     )
 })
+
+// get all videos
+export const getAllVideos = asyncHandler(async(req , res) => {
+      const {page = 1 , limit = 10 , query , sortBy , sortType , userId} = req.query;
+      
+
+})
+
+// get video by id
+export const getSingleVideo = asyncHandler(async(req , res) => {
+    const {videoId} = req.params;
+
+    const videoFile = await Video.findById(videoId);
+
+    if(!videoFile){
+        throw new ApiError(400 , "Error while fetching video");
+    }
+
+    return res.status(201).json(
+        new ApiResponse(201 , videoFile , "Video fetched Successfully")
+    )
+})
