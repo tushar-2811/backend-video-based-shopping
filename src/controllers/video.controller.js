@@ -1,3 +1,4 @@
+import { User } from "../models/user.model.js";
 import { Video } from "../models/video.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -69,6 +70,46 @@ export const deleteVideo = asyncHandler(async(req , res) => {
 // get all videos
 export const getAllVideos = asyncHandler(async(req , res) => {
       const {page = 1 , limit = 10 , query , sortBy , sortType , userId} = req.query;
+
+      page = parseInt(page);
+      limit = parseInt(limit);
+
+      if(userId) {
+          const userPostedVideos = await Video.aggregate([
+            {
+                $match : {
+                    owner : userId
+                }
+            }
+          ])
+
+          return res.status(201).json(
+            new ApiResponse(201 , userPostedVideos , "User Posted Videos fetched successfully")
+          )
+      }
+
+    
+
+      if(!query){
+         const videos = await Video.aggregate([
+            {
+                $limit : limit
+            },
+            {
+                $sort : {
+                    sortBy : sortType
+                }
+            }
+         ])
+
+         return res.status(201).json(
+            new ApiResponse(201 , videos , "Videos fetched successful")
+         )
+      }
+
+
+
+      
       
 
 })
