@@ -18,7 +18,7 @@ export const uploadVideo = asyncHandler(async(req , res) => {
         throw new ApiError(400 , "User not defined Properly");
     }
 
-    const videoLocalPath = req.files.uVideo[0]?.path;
+    const videoLocalPath = req.files.videoFile[0]?.path;
     const thumbnailLocalPath = req.files.thumbnail[0]?.path;
 
 
