@@ -245,13 +245,15 @@ export const updateAvatar = asyncHandler(async(req , res) => {
     const avatarLocalPath = req.file?.path;
     const userId = req.user?._id;
 
+
     if(!avatarLocalPath){
         throw new ApiError(400 , "Avatar file is missing");
     }
 
     const avatar = await uploadOnCloudinary(avatarLocalPath);
 
-    if(!avatar.url){
+
+    if(!avatar?.url){
         throw new ApiError(400 , "Error while uploading Avatar");
     }
 
@@ -310,7 +312,7 @@ export const getUserChannelProfile = asyncHandler(async(req , res) => {
                     $size : "$subscribedTo"
                 },
                 isSubscribed : {
-                    $con : {
+                    $cond : {
                         if: {$in: [req.user?._id , "$subscribers.subscriber"]},
                         then : true,
                         else : false
@@ -349,7 +351,7 @@ export const getWatchHistory = asyncHandler(async(req , res) => {
     const user = await User.aggregate([
         {
             $match : {
-                _id : new mongoose.Types.ObjectId.createFromTime(req.user._id)
+                _id : new mongoose.Types.ObjectId(req.user._id)
             }
         },
         {

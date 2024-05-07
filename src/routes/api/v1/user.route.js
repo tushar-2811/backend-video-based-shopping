@@ -20,7 +20,7 @@ userRouter.route('/login').post(loginUser);
 // secured Routes
 userRouter.route('/logout').post(verifyJWT, logoutUser);
 userRouter.route('/refreshToken').post(refreshAccessToken);
-userRouter.route('/getCurrentUser').post(verifyJWT , getCurrentUser);
+userRouter.route('/getCurrentUser').get(verifyJWT , getCurrentUser);
 userRouter.route('/updatePassword').post(verifyJWT , changeCurrentPassword);
 
 userRouter.route('/updateAvatar').patch(upload.single("avatar"), verifyJWT , updateAvatar);
