@@ -169,7 +169,7 @@ export const logoutUser = asyncHandler(async(req , res) => {
 
 
 // refresh the access token
-export const refreshAccessToken = asyncHandler(async() => {
+export const refreshAccessToken = asyncHandler(async(req , res) => {
   try {
       const incomingRefreshToken =  req.cookies.refreshToken || req.body.refreshToken;
   
@@ -189,7 +189,7 @@ export const refreshAccessToken = asyncHandler(async() => {
          throw new ApiError(401 , "Refresh Token is Expired or Used");
      }
   
-     const {accessToken , refreshToken} = await existingUser.generateAccessAndRefreshTokens(existingUser._id);
+     const {accessToken , refreshToken} = await generateAccessAndRefreshTokens(existingUser._id);
   
      return res.status(201)
      .cookie("accessToken" , accessToken , options)
