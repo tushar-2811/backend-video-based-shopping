@@ -16,8 +16,8 @@ videoRouter.route('/uploadVideo').post(verifyJWT,upload.fields([
     }
 ]),uploadVideo);
 
-videoRouter.route('getAllVideos').get(getAllVideos);
-videoRouter.route('/getSingleVideo').get(getSingleVideo);
+videoRouter.route('/getAllVideos').get(getAllVideos);
+videoRouter.route('/getSingleVideo/:videoId').get(getSingleVideo);
 
 videoRouter.route('/deleteVideo/:videoId').delete(verifyJWT , deleteVideo);
 

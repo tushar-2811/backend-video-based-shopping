@@ -62,6 +62,10 @@ export const deleteVideo = asyncHandler(async(req , res) => {
 
     const existingVideo = await Video.findByIdAndDelete(videoId);
 
+    if(!existingVideo) {
+        return new ApiError(501 , "error while deleting the video");
+    }
+
     return res.status(201).json(
         new ApiResponse(201 , {} , "Deleted Successfully")
     )
