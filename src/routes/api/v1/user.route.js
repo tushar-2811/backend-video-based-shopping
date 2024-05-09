@@ -26,7 +26,8 @@ userRouter.route('/updatePassword').post(verifyJWT , changeCurrentPassword);
 userRouter.route('/updateAvatar').patch(upload.single("avatar"), verifyJWT , updateAvatar);
 
 userRouter.route('/getUserChannel/:userName').post(verifyJWT,getUserChannelProfile);
-userRouter.route('/getUserHistory').get(verifyJWT,getWatchHistory)
+userRouter.route('/getUserHistory').get(verifyJWT,getWatchHistory);
+
 
 
 
