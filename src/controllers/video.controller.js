@@ -132,3 +132,24 @@ export const getSingleVideo = asyncHandler(async(req , res) => {
         new ApiResponse(201 , videoFile , "Video fetched Successfully")
     )
 })
+
+// toggle publish status
+export const togglePublishStatus = asyncHandler(async(req , res) => {
+    const {videoId} = req.params;
+    const {isPublished} = req.body;
+
+    const videoFile = await Video.findByIdAndUpdate(videoId , {
+        $set : {
+            isPublished : isPublished
+        }
+    });
+
+    if(!videoFile) {
+        return new ApiError(400 , "Error while publishing the video");
+    }
+
+    return res.status(201).json(
+        new ApiResponse(201 , {} , "video published successfully")
+    )
+
+})
