@@ -145,7 +145,7 @@ export const togglePublishStatus = asyncHandler(async(req , res) => {
     });
 
     if(!videoFile) {
-        return new ApiError(400 , "Error while publishing the video");
+        throw new ApiError(400 , "Error while publishing the video");
     }
 
     return res.status(201).json(
