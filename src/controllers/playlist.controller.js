@@ -124,6 +124,20 @@ export const addVideoToPlaylist = asyncHandler(async(req , res) => {
 // remove video from playlist
 export const removeVideoFromPlaylist = asyncHandler(async(req , res) => {
     const {PlaylistId , videoId} = req.params;
+
+    if(!PlaylistId || !videoId){
+        throw new ApiError(400 , "PlaylistId or videoId is missing");
+    }
+
+    const existingPlaylist = await Playlist.findByIdAndUpdate(PlaylistId , {
+        $pull : {
+            videos : videoId
+        }
+    })
+
+    return res.status(201).json(
+        new ApiResponse(201 , existingPlaylist , "Video removed successfully")
+    )
 })
 
 
