@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { User } from "../models/user.model.js";
 import { Video } from "../models/video.model.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -56,7 +57,6 @@ export const uploadVideo = asyncHandler(async(req , res) => {
 
 
 // delete video from database
-
 export const deleteVideo = asyncHandler(async(req , res) => {
     const {videoId} = req.params;
 
@@ -122,14 +122,51 @@ export const getAllVideos = asyncHandler(async(req , res) => {
 export const getSingleVideo = asyncHandler(async(req , res) => {
     const {videoId} = req.params;
 
-    const videoFile = await Video.findById(videoId);
+    const videoFile = await Video.aggregate([
+        {
+            $match : {
+                _id : new mongoose.Types.ObjectId(videoId)
+            }
+        },
+        {
+            $lookup : {
+                from : "users",
+                localField : "owner",
+                foreignField : "_id",
+                as : "videoOwner",
+              
+            }
+        },
+        {
+            $unwind : "$videoOwner"
+        },
+        {
+            $project : {
+                videoFile : 1,
+                thumbnail : 1,
+                title : 1,
+                description : 1,
+                duration : 1,
+                views : 1,
+                isPublished : 1,
+                videoOwner : {
+                    _id : 1,
+                    userName : 1,
+                    email : 1,
+                    avatar : 1
+                }
+            }
+        }
+    ])
 
-    if(!videoFile){
+  
+
+    if(!videoFile?.length){
         throw new ApiError(400 , "Error while fetching video");
     }
 
     return res.status(201).json(
-        new ApiResponse(201 , videoFile , "Video fetched Successfully")
+        new ApiResponse(201 , videoFile[0] , "Video fetched Successfully")
     )
 })
 
