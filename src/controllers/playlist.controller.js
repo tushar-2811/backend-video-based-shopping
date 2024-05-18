@@ -110,6 +110,8 @@ export const addVideoToPlaylist = asyncHandler(async(req , res) => {
         $push : {
             videos : videoId
         }
+    } , {
+        new : true
     })
 
     if(!existingPlaylist){
@@ -133,6 +135,8 @@ export const removeVideoFromPlaylist = asyncHandler(async(req , res) => {
         $pull : {
             videos : videoId
         }
+    } , {
+        new : true
     })
 
     return res.status(201).json(
