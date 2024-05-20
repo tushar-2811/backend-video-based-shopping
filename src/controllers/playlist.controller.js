@@ -4,6 +4,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { Video } from "../models/video.model.js";
+import mongoose from "mongoose";
 
 
 // create a playlist
@@ -73,15 +74,82 @@ export const getPlaylist = asyncHandler(async(req , res) => {
     if(!PlaylistId) {
         throw new ApiError(400 , "Playlist Id is missing");
     }
+    console.log(PlaylistId)
+    // const existingPlaylist = await Playlist.findById(PlaylistId);
+    const existingPlaylist = await Playlist.aggregate([
+        {
+            $match : {
+                _id : new mongoose.Types.ObjectId(PlaylistId)
+            }
+        },
+        {
+            $lookup : {
+                from : "videos",
+                localField : "videos",
+                foreignField : "_id",
+                as : "videos",
+                pipeline : [
+                    {
+                        $lookup : {
+                            from : "users",
+                            localField : "owner",
+                            foreignField : "_id",
+                            as : "owner",
+                            pipeline : [
+                                {
+                                    $project : {
+                                        userName : 1,
+                                        avatar : 1
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields : {
+                            owner : {
+                                $first : "$owner"
+                            }
+                        }
+                    }
+                    
+                ]
+            }
+        },
+        {
+            $lookup : {
+                from : "users",
+                localField : "owner",
+                foreignField : "_id",
+                as : "owner",
+                pipeline : [
+                    {
+                        $project : {
+                            userName : 1,
+                            fullName : 1,
+                            avatar : 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields : {
+                owner : {
+                    $first : "$owner"
+                }
+            }
+        },
+        
+    ])
 
-    const existingPlaylist = await Playlist.findById(PlaylistId);
 
-    if(!existingPlaylist) {
+    if(!existingPlaylist?.length) {
         throw new ApiError(500 , "Playlist not found");
     }
 
     return res.status(201).json(
-        new ApiResponse(201 , existingPlaylist , "Playlist found")
+        new ApiResponse(201 , existingPlaylist[0] , "Playlist found")
     )
 
 })
