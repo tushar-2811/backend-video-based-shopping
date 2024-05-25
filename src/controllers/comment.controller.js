@@ -75,6 +75,32 @@ export const addComment = asyncHandler(async(req , res) => {
 
 // update a comment
 export const updateComment = asyncHandler(async(req , res) => {
+      const {commentId} = req.params;
+      const {commentContent} = req.body;
+
+      if(!commentId){
+        throw new ApiError(400 , "No comment found");
+      }
+
+      if(!commentContent){
+        throw new ApiError(400 , "Please Comment something to publish");
+      }
+
+      const updatedComment = await Comment.findByIdAndUpdate(commentId , {
+         $set : {
+          content : commentContent
+         }
+      } , {
+        new : true
+      })
+
+      if(!updateComment){
+        throw new ApiError(400 , "Error while updating the comment");
+      }
+
+      return res.status(201).json(
+        new ApiResponse(201 , updatedComment , "Comment updated Successfully")
+      )
 
 })
 
