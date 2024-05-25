@@ -1,9 +1,75 @@
-import { asyncHandler } from "../utils/asyncHandler";
-import { Comment } from "../models/comment.model";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { Comment } from "../models/comment.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import mongoose from 'mongoose'
 
 
 // add comment on a video
 export const addComment = asyncHandler(async(req , res) => {
+      const {videoId} = req.params;
+      const userId = req.user._id;
+      const {commentContent} = req.body;
+
+      if(!videoId){
+        throw new ApiError(400 , "No video found");
+      }
+
+      if(!userId) {
+        throw new ApiError(400 , "Please Sign In");
+      }
+
+      if(!commentContent){
+        throw new ApiError(400 , "Please Comment something to publish");
+      }
+
+      const newComment = await Comment.create({
+         content : commentContent,
+         video : videoId,
+         owner : userId
+      })
+
+      if(!newComment){
+        throw new ApiError(400 , "Error while commenting");
+      }
+
+      const newCommentData = await Comment.aggregate([
+        {
+          $match : {
+            _id : new mongoose.Types.ObjectId(newComment._id)
+          }
+        },
+        {
+          $lookup : {
+            from : "users",
+            localField : "owner",
+            foreignField : "_id",
+            as : "owner",
+            pipeline : [
+              {
+                $project : {
+                  userName : 1,
+                  fullName : 1,
+                  avatar : 1
+                }
+              }
+            ]
+          }
+        },
+        {
+          $addFields : {
+             owner : {
+              $first : "$owner"
+             }
+          }
+        }
+      ])
+
+      
+
+      return res.status(201).json(
+        new ApiResponse(201 , newCommentData , "New Comment published")
+      )
 
 })
 
