@@ -106,7 +106,21 @@ export const updateComment = asyncHandler(async(req , res) => {
 
 // delete a comment
 export const deleteComment = asyncHandler(async(req , res) => {
+      const {commentId} = req.params;
 
+      if(!commentId){
+        throw new ApiError(400 , "No Valid Comment Id")
+      }
+
+      const deletedComment = await Comment.findByIdAndDelete(commentId);
+
+      if(!deletedComment){
+        throw new ApiError(400 , "Error while deleting the comment");
+      }
+
+      res.status(201).json(
+        new ApiResponse(201, {} , "Comment Deleted Successfully")
+      )
 })
 
 // get all comments on a video
