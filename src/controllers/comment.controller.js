@@ -126,8 +126,52 @@ export const deleteComment = asyncHandler(async(req , res) => {
 // get all comments on a video
 export const getAllComments = asyncHandler(async(req , res) => {
     const {videoId} = req.params;
-    const {page = 1 , limit = 10} = req.query;
+    // const {page = 1 , limit = 10} = req.query;
+    let limit = 10;
 
+    if(!videoId){
+      throw new ApiError(400 , "No video Selected");
+    }
+
+    const commentsOnVideo = await Comment.aggregate([
+      {
+        $match : {
+          video : new mongoose.Types.ObjectId(videoId)
+        }
+      },
+      {
+        $lookup : {
+          from : "users",
+          localField : "owner",
+          foreignField : "_id",
+          as : "owner",
+          pipeline : [
+            {
+              $project : {
+                userName : 1,
+                fullName : 1,
+                avatar : 1
+              }
+            }
+          ]          
+        }
+      },
+      {
+        $addFields : {
+          owner : {
+            $first : "$owner"
+          }
+        }
+      },
+      {
+        $limit : limit
+      },
+    
+    ])
+
+    return res.status(201).json(
+      new ApiResponse(201 , commentsOnVideo , "Comments on video")
+    )
 
 
 })
