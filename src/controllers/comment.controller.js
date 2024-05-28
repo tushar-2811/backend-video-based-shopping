@@ -126,8 +126,9 @@ export const deleteComment = asyncHandler(async(req , res) => {
 // get all comments on a video
 export const getAllComments = asyncHandler(async(req , res) => {
     const {videoId} = req.params;
-    // const {page = 1 , limit = 10} = req.query;
-    let limit = 10;
+    const {page = 1 , limit = 10} = req.query;
+    
+    const skip = (page - 1) * limit;
 
     if(!videoId){
       throw new ApiError(400 , "No video Selected");
@@ -164,7 +165,10 @@ export const getAllComments = asyncHandler(async(req , res) => {
         }
       },
       {
-        $limit : limit
+        $skip : skip
+      },
+      {
+        $limit : parseInt(limit)
       },
     
     ])
@@ -172,6 +176,5 @@ export const getAllComments = asyncHandler(async(req , res) => {
     return res.status(201).json(
       new ApiResponse(201 , commentsOnVideo , "Comments on video")
     )
-
 
 })
