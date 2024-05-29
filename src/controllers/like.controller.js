@@ -16,6 +16,7 @@ export const toggleVideoLike = asyncHandler(async(req , res) => {
 
     // if video is already liked by this user
     // then, just dislike it
+    
 
     
 
@@ -34,6 +35,22 @@ export const getAllLikedVideos = asyncHandler(async(req , res) => {
     if(!userId){
         throw new ApiError(400 , "User is not defined");
     }
+
+    const likedVideos = await Like.aggregate([
+        {
+            $match : {
+                likedBy : userId
+            }
+        },
+        {
+            $lookup : {
+                from : "videos",
+                localField : "video",
+                foreignField : "_id",
+                as : "video"
+            }
+        }
+    ])
 
 
 })
